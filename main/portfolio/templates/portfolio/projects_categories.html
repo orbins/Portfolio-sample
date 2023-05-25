@@ -1,0 +1,10 @@
+<div class="gallery-menu row">
+	<div class="col-md-12">
+		<div class="button-group filter-button-group text-left">
+			<button><a href ="{% url 'home' %}">Home</a></button>
+			{% for category in categories %}
+				<button><a href ="{{ category.get_absolute_url }}#portfolio">{{ category.title }}</a></button>
+			{% endfor %}
+		</div>
+	</div>
+</div>
