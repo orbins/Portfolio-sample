@@ -1,0 +1,7 @@
+venv
+ТЗ.text
+main/main/.env
+portfolio/__pycache__/views.cpython-39.pyc
+main/__pycache__/settings.cpython-39.pyc
+tt.txt
+.idea
