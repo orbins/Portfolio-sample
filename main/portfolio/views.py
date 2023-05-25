@@ -2,7 +2,7 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
 from django.db.models import F
-from django.shortcuts import render, redirect, reverse
+from django.shortcuts import render, redirect
 from django.views.generic import DetailView, ListView, FormView
 
 from .forms import ContactForm
@@ -20,7 +20,7 @@ class HomeView(FormView):
         return context
 
     def form_valid(self, form):
-        mail = send_mail(
+        send_mail(
             subject=form.cleaned_data['subject'],
             message=(
                 f"{form.cleaned_data['content']} "
@@ -30,17 +30,23 @@ class HomeView(FormView):
             recipient_list=(settings.EMAIL_HOST_USER, ),
             fail_silently=False
         )
-        if mail:
-            messages.success(self.request, "Сообщение успешно отправлено")
-        else:
-            messages.error(self.request, "Данные введены некорректно!")
+        messages.success(self.request, "Сообщение успешно отправлено")
         return redirect('home')
 
+    def form_invalid(self, form):
+        messages.error(self.request, "Данные введены некорректно!")
+        return super().form_invalid(form)
 
-def get_category(request, slug):
-    items = get_projects(slug=slug)
-    form = ContactForm()
-    return render(request, 'base.html', {'items': items, 'form': form})
+
+class CategoryView(FormView):
+    form_class = ContactForm
+    template_name = 'base.html'
+
+    def get_context_data(self, **kwargs):
+        slug = self.kwargs['slug']
+        context = super().get_context_data(**kwargs)
+        context['items'] = get_projects(slug=slug)
+        return context
 
 
 class ProjectView(DetailView):
