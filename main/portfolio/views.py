@@ -14,6 +14,9 @@ from .services import get_projects
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
 class HomeView(FormView):
+    """
+    View для домашней страницы
+    """
     form_class = ContactForm
     template_name = 'base.html'
 
@@ -43,6 +46,9 @@ class HomeView(FormView):
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
 class CategoryView(FormView):
+    """
+    View для отображения проектов по категории
+    """
     form_class = ContactForm
     template_name = 'base.html'
 
@@ -55,6 +61,9 @@ class CategoryView(FormView):
 
 @method_decorator(cache_page(60 * 15), name='dispatch')
 class ProjectView(DetailView):
+    """
+    View для отображения отдельного проекта
+    """
     template_name = 'portfolio/single.html'
     allow_empty = False
     context_object_name = 'item'
@@ -83,6 +92,9 @@ class ProjectView(DetailView):
 
 @method_decorator(cache_page(60 * 5), name='dispatch')
 class ProjectByTag(ListView):
+    """
+    View для отображения проектов по тегу
+    """
     template_name = 'base.html'
     allow_empty = False
     context_object_name = 'items'

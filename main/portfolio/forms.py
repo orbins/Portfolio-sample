@@ -2,6 +2,10 @@ from django import forms
 
 
 class ContactForm(forms.Form):
+    """
+    Контактная форма
+    для связи с владельцем портфолио
+    """
     name = forms.CharField(
         widget=forms.TextInput(
             attrs={
