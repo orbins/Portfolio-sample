@@ -1,4 +1,5 @@
 from .models import Project, Category
+from django.views.decorators.cache import cache_page
 
 
 def get_categories():

@@ -73,6 +73,14 @@ TEMPLATES = [
     },
 ]
 
+CACHES = {
+    'default': {
+        'BACKEND': 'django.core.cache.backends.filebased.FileBasedCache',
+        'LOCATION': 'C:/Users/Home/Desktop/Projects/django/DP4 (portfolio)/main/cache.txt',
+    }
+}
+
+
 WSGI_APPLICATION = 'main.wsgi.application'
 
 
@@ -129,3 +137,4 @@ EMAIL_HOST_USER = os.getenv('EMAIL_HOST_USER')
 EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
+TO_EMAIL = os.getenv('EMAIL_HOST')

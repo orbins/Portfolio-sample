@@ -2,7 +2,9 @@ from django.core.mail import send_mail
 from django.conf import settings
 from django.contrib import messages
 from django.db.models import F
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django.views.generic import DetailView, ListView, FormView
 
 from .forms import ContactForm
@@ -10,6 +12,7 @@ from .models import Project, Gallery
 from .services import get_projects
 
 
+@method_decorator(cache_page(60 * 5), name='dispatch')
 class HomeView(FormView):
     form_class = ContactForm
     template_name = 'base.html'
@@ -27,7 +30,7 @@ class HomeView(FormView):
                 f"\nfrom {form.cleaned_data['name']}, "
                 f"{form.cleaned_data['email']}"),
             from_email=settings.EMAIL_HOST_USER,
-            recipient_list=(settings.EMAIL_HOST_USER, ),
+            recipient_list=(settings.TO_EMAIL,),
             fail_silently=False
         )
         messages.success(self.request, "Сообщение успешно отправлено")
@@ -38,6 +41,7 @@ class HomeView(FormView):
         return super().form_invalid(form)
 
 
+@method_decorator(cache_page(60 * 5), name='dispatch')
 class CategoryView(FormView):
     form_class = ContactForm
     template_name = 'base.html'
@@ -49,30 +53,42 @@ class CategoryView(FormView):
         return context
 
 
+@method_decorator(cache_page(60 * 15), name='dispatch')
 class ProjectView(DetailView):
     template_name = 'portfolio/single.html'
     allow_empty = False
     context_object_name = 'item'
+    model = Project
 
-    # Обычно фильтрация происходит благодаря методу get_absolute_url в модели, он определяет адрес конкретного объекта
-    # Но здесь я не определял, model
-    def get_queryset(self):
-        return Project.objects.select_related('category').only('title', 'content', 'image', 'views','category__slug',
-                                                               'category__title').filter(slug=self.kwargs['slug'])
+    def get_object(self):
+        return Project.objects.select_related(
+            'category').only(
+                'title', 'content',
+                'image', 'views',
+                'category__slug',
+                'category__title'
+            ).get(
+                slug=self.kwargs['slug']
+            )
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         project = self.get_queryset()[0]
         project.views = F('views') + 1
         project.save()
-        context['photos'] = Gallery.objects.filter(project=project.id) #/pk
+        context['photos'] = Gallery.objects.filter(
+                                project=project.id)
         return context
 
 
+@method_decorator(cache_page(60 * 5), name='dispatch')
 class ProjectByTag(ListView):
     template_name = 'base.html'
     allow_empty = False
     context_object_name = 'items'
 
     def get_queryset(self):
-        return Project.objects.only('slug', 'image').filter(tags__slug=self.kwargs['slug']).prefetch_related('tags')
+        return Project.objects.only(
+            'slug', 'image').filter(
+                tags__slug=self.kwargs['slug']).prefetch_related(
+                    'tags')
