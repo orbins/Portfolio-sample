@@ -121,6 +121,6 @@ EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
 EMAIL_USE_TLS = False
 EMAIL_USE_SSL = True
 
-TO_EMAIL = os.getenv('orwellj@mail.ru')
+TO_EMAIL = os.getenv('TO_EMAIL')
 # почта, на которую будут приходить письма,
-# укажите вашу почту
+# отправляемые после заполнения формы
